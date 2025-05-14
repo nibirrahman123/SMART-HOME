@@ -1,103 +1,94 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const ESP_IP = "http://192.168.31.6";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+  const [led1, setLed1] = useState(false);
+  const [led2, setLed2] = useState(false);
+  const [relay, setRelay] = useState(false);
+
+  const handleControl = async (device, action) => {
+    try {
+      await fetch(`${ESP_IP}/${device}/${action}`);
+      if (device === "led1") setLed1(action === "on");
+      else if (device === "led2") setLed2(action === "on");
+      else if (device === "relay") setRelay(action === "on");
+    } catch (error) {
+      alert("Failed to reach ESP8266. Check Wi-Fi and IP.");
+    }
+  };
+
+  const ControlBlock = ({ label, device, isOn, delay = 0 }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay }}
+      className="flex flex-col bg-[#f5f5f4]/80 w-96 p-2 text-gray-700 rounded-lg gap-2 backdrop-blur-md shadow-lg hover:shadow-xl transition-shadow duration-300"
+    >
+      <motion.a
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.03 }}
+        onClick={() => handleControl(device, "on")}
+        className="bg-[#86f066] px-6 py-4 rounded-lg transition-all text-center cursor-pointer"
+      >
+        {label} ON
+      </motion.a>
+      <motion.a
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.03 }}
+        onClick={() => handleControl(device, "off")}
+        className="bg-[#f86d36] px-6 py-4 rounded-lg transition-all text-center cursor-pointer"
+      >
+        {label} OFF
+      </motion.a>
+    </motion.div>
+  );
+
+  return (
+    <main className="relative min-h-screen flex items-center justify-center p-8 overflow-hidden">
+      {/* Animated Blurred Background */}
+      <motion.div
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1.1, opacity: 1 }}
+        transition={{ duration: 1.2 }}
+        className="absolute inset-0 bg-cover bg-center blur-sm scale-110"
+        style={{ backgroundImage: 'url("/myHomeBg.jpg")' }}
+      ></motion.div>
+
+      {/* Foreground Content */}
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
+        className="relative z-10 flex flex-col items-center text-black font-extrabold"
+      >
+        <motion.h1
+          className="text-4xl md:text-5xl text-white mb-10"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          OUR PROJECTS
+        </motion.h1>
+
+        <motion.div
+          className="grid gap-6"
+          animate={{ y: [0, -10, 0] }}
+          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <ControlBlock label="Mini LED 1" device="led1" isOn={led1} delay={0.2} />
+          <ControlBlock label="Mini LED 2" device="led2" isOn={led2} delay={0.4} />
+          <ControlBlock label="Main Light" device="relay" isOn={relay} delay={0.6} />
+          <button className="p-4 border rounded-lg bg-gradient-to-r from-green-300 text-white to-[tomato]">
+            <a href="https://whatismyipaddress.com/">find me</a>
+          </button>
+
+        </motion.div>
+        
+      </motion.div>
+    </main>
   );
 }
