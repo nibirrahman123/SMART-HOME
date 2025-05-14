@@ -82,8 +82,11 @@ export default function Home() {
           <ControlBlock label="Mini LED 1" device="led1" isOn={led1} delay={0.2} />
           <ControlBlock label="Mini LED 2" device="led2" isOn={led2} delay={0.4} />
           <ControlBlock label="Main Light" device="relay" isOn={relay} delay={0.6} />
-          <button className="p-4 border rounded-lg bg-gradient-to-r from-green-300 text-white to-[tomato]">
-            <a href="https://whatismyipaddress.com/">find me</a>
+          <button
+            className="p-4 border-8  rounded-lg bg-gradient-to-r from-green-300 text-white to-[tomato]"
+            onClick={() => window.location.href = "https://whatismyipaddress.com/"}
+          >
+            find me
           </button>
 
         </motion.div>
